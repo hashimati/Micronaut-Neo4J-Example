@@ -1,0 +1,1 @@
+mn create-app io-hashimati-neojexample --profile service --lang java --build gradle--features neo4j-bolt

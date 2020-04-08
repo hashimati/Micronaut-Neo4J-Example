@@ -1,0 +1,5 @@
+profile: service
+defaultPackage: io.hashimati.neojexample
+---
+testFramework: junit
+sourceLanguage: java

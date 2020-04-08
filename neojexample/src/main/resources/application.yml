@@ -1,0 +1,29 @@
+micronaut:
+  application:
+    name: neojexample
+  server:
+    port: 8080
+
+
+---
+micronaut:
+  views:
+    thymeleaf:
+      enabled: true
+
+---
+micronaut:
+  router:
+    static-resources:
+      default:
+        mapping: "/**"
+      '*':
+        paths:
+        - "classpath:static"
+
+---
+
+neo4j:
+  uri: bolt://${NEO4J_HOST:localhost}
+  username: neo4j
+  password: p

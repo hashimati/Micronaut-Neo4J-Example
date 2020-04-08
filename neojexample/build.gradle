@@ -1,0 +1,76 @@
+plugins {
+id "net.ltgt.apt-eclipse" version "0.21"
+id "com.github.johnrengelman.shadow" version "5.2.0"
+id "com.diffplug.gradle.spotless" version "3.27.0"
+}
+apply plugin:"application"
+sourceCompatibility='1.8'
+targetCompatibility='1.8'
+version "0.1"
+group "io.hashimati"
+repositories {
+mavenCentral()
+	maven { url "https://jcenter.bintray.com" }
+}
+configurations {
+    // for dependencies that are needed for development only
+    developmentOnly 
+}
+dependencies {
+	annotationProcessor 'org.projectlombok:lombok:1.18.12'
+	annotationProcessor "io.micronaut:micronaut-inject-java"
+	annotationProcessor "io.micronaut:micronaut-validation"
+	annotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
+	compile 'com.google.googlejavaformat:google-java-format:1.7'
+	compile 'io.micronaut:micronaut-views'
+	compile group: 'io.projectreactor', name: 'reactor-core', version: '3.3.1.RELEASE'
+	implementation "io.micronaut.configuration:micronaut-neo4j-bolt"
+	implementation "io.micronaut:micronaut-http-client"
+	implementation "io.micronaut:micronaut-http-server-netty"
+	implementation "io.micronaut:micronaut-inject"
+	implementation "io.micronaut:micronaut-runtime"
+	implementation "io.micronaut:micronaut-validation"
+	implementation "javax.annotation:javax.annotation-api"
+	implementation platform("io.micronaut:micronaut-bom:$micronautVersion")
+	runtime 'org.thymeleaf:thymeleaf:3.0.11.RELEASE'
+	runtimeOnly "ch.qos.logback:logback-classic:1.2.3"
+	testAnnotationProcessor "io.micronaut:micronaut-inject-java"
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+	testAnnotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
+	testCompile "io.micronaut.test:micronaut-test-junit5"
+	testCompile "org.junit.jupiter:junit-jupiter-api"
+	testCompile group: 'io.projectreactor', name: 'reactor-test', version: '3.3.1.RELEASE'
+	testCompileOnly 'org.projectlombok:lombok:1.18.12'
+	testRuntime "org.junit.jupiter:junit-jupiter-engine"
+	testRuntime "org.neo4j.test:neo4j-harness"
+ 	compileOnly 'org.projectlombok:lombok:1.18.12'
+
+	testCompile 'com.intuit.karate:karate-junit5:0.9.5'
+    testCompile 'com.intuit.karate:karate-apache:0.9.5'
+	// https://mvnrepository.com/artifact/net.masterthought/cucumber-reporting
+	compile group: 'net.masterthought', name: 'cucumber-reporting', version: '5.1.1'
+	// https://mvnrepository.com/artifact/org.mockito/mockito-core
+	testCompile group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
+}
+test.classpath += configurations.developmentOnly
+mainClassName = "io.hashimati.neojexample.Application"
+// use JUnit 5 platform
+test {
+    useJUnitPlatform()
+	systemProperty "karate.options", System.properties.getProperty("karate.options")
+    // pull karate env into the runtime
+    systemProperty "karate.env", System.properties.getProperty("karate.env")
+    // ensure tests are always run
+    outputs.upToDateWhen { false }
+}
+tasks.withType(JavaCompile){
+    options.encoding = "UTF-8"
+    options.compilerArgs.add('-parameters')
+}
+shadowJar {
+    mergeServiceFiles()
+}
+tasks.withType(JavaExec) {
+    classpath += configurations.developmentOnly
+    jvmArgs('-XX:TieredStopAtLevel=1', '-Dcom.sun.management.jmxremote')
+}
